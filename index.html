@@ -191,7 +191,10 @@ function stats(){$('timer').textContent=clock(elapsedNow());$('distance').textCo
 function initMap(){
  if(map||!window.L)return;
  map=L.map('map',{zoomControl:false}).setView([27.95,-82.46],15);
- L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap © CARTO'}).addTo(map);
+ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  maxZoom:19,
+  attribution:'&copy; OpenStreetMap contributors'
+ }).addTo(map);
  L.control.zoom({position:'bottomright'}).addTo(map);
  liveLine=L.polyline([],{color:'#9b7bff',weight:6,opacity:.95}).addTo(map);
  marker=L.circleMarker([27.95,-82.46],{radius:8,color:'#fff',weight:3,fillColor:'#9b7bff',fillOpacity:1}).addTo(map);
