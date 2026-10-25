@@ -3,246 +3,241 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#080808">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d17">
 <title>kcal.</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-:root{color-scheme:dark;--bg:#080808;--card:#151515;--line:#2c2c2c;--muted:#999}
+:root{--bg:#0b0d17;--card:#15182a;--line:#2b3049;--purple:#9b7bff;--text:#f6f5ff;--muted:#a5a9c1}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#f7f7f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:18px 16px calc(105px + env(safe-area-inset-bottom))}
-header{display:flex;justify-content:space-between;align-items:center;margin:4px 0 25px}
-.logo{font-size:31px;font-weight:900;letter-spacing:-2px}
-h1{font-size:28px;letter-spacing:-1px;margin:10px 0}
-h2{font-size:19px;margin:0 0 15px}
-.muted,.hint{color:var(--muted);font-size:13px;line-height:1.6}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;margin:14px 0}
-.big{font-size:39px;font-weight:850;letter-spacing:-1px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:20px 15px 100px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.logo{font-size:32px;font-weight:900;letter-spacing:-1px}.logo span{color:var(--purple)}
+h1{font-size:27px;margin:8px 0}h2{font-size:19px;margin:0 0 14px}
+p,.muted{color:var(--muted);line-height:1.5}
+.page{display:none;max-width:700px;margin:auto}.page.active{display:block}
+.card{background:linear-gradient(145deg,#191c31,#111423);border:1px solid var(--line);border-radius:22px;padding:18px;margin:13px 0}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:#202020;border-radius:13px;padding:14px}
-.stat strong{display:block;font-size:22px;margin-top:7px}
-.bar{height:8px;background:#333;border-radius:20px;overflow:hidden;margin:13px 0}
-.bar span{display:block;height:100%;width:0;background:#fff}
-.row{display:flex;gap:9px}
-.row>*{flex:1;min-width:0}
-label{display:block;color:#bbb;font-size:13px;margin:5px 0}
-input,select{display:block;width:100%;padding:13px;background:#202020;border:1px solid #383838;border-radius:11px;color:white;margin:6px 0 13px;font:inherit}
-button{display:block;width:100%;padding:14px;background:#fff;color:#080808;border:0;border-radius:11px;font:inherit;font-weight:750;text-align:center;cursor:pointer}
-button.secondary{background:#292929;color:white}
-button.danger{background:#351b1b;color:#ffbcbc;width:auto;padding:8px 11px;font-size:13px}
-.page{display:none}.page.active{display:block}
-nav{position:fixed;z-index:5;bottom:0;left:0;right:0;display:flex;gap:2px;justify-content:space-around;background:#111;border-top:1px solid #292929;padding:9px 5px calc(9px + env(safe-area-inset-bottom))}
-nav button{flex:1;background:transparent;color:#999;padding:9px 2px;font-size:12px;line-height:1.7}
-nav button.active{background:#292929;color:white}
-.entry{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid #303030;padding:13px 0}
-.entry>div{min-width:0;overflow-wrap:anywhere}
-.entry small{display:block;color:#999;margin-top:5px;line-height:1.5}
-.empty{color:#999;font-size:14px;padding:12px 0}
-.file-input{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-.preview{width:100%;max-height:250px;object-fit:cover;border-radius:12px;margin:8px 0}
-#chart{width:100%;height:160px;display:block}
+.stat{background:#0e1120;border:1px solid var(--line);padding:13px;border-radius:15px}
+.stat strong{display:block;font-size:23px;margin:7px 0}
+.small{font-size:12px;color:var(--muted)}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.btn{background:linear-gradient(135deg,#7048ff,var(--purple));border:0;color:white;border-radius:14px;padding:14px;font-weight:800}
+.btn.secondary{background:#252943;border:1px solid #383d59}
+.btn.danger{background:#542238}
+.full{width:100%}
+.field{margin:13px 0}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}
+input,select{width:100%;background:#0d1020;color:white;border:1px solid #383d59;border-radius:12px;padding:13px}
+nav{position:fixed;z-index:1000;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:#0b0d17ed;backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:10px 3px calc(10px + env(safe-area-inset-bottom))}
+nav button{background:none;color:#969bb4;border:0;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+nav button b{font-size:21px}nav button.active{color:var(--purple)}
+.bar{height:8px;border-radius:10px;background:#30334c;overflow:hidden;margin:10px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#7048ff,#c1a9ff);width:0}
+.pills{display:flex;gap:9px;margin:12px 0}
+.pills button{flex:1;background:#242840;border:1px solid #383d59;color:white;padding:12px;border-radius:13px;font-weight:800}
+.pills button.active{background:#4b347c;border-color:var(--purple)}
+#map{height:40vh;min-height:280px;border-radius:17px;overflow:hidden;background:#15182a}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}
+.metric{background:#0d1020;border:1px solid var(--line);border-radius:13px;padding:12px 4px;text-align:center}
+.metric strong{font-size:clamp(18px,5vw,25px);display:block;white-space:nowrap}
+.metric span{font-size:10px;color:var(--muted);display:block;margin-top:5px}
+#stepsCard{margin-top:9px}
+.item{padding:12px 0;border-bottom:1px solid var(--line)}
+.hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}
+@media(min-width:600px){body{padding-bottom:100px}.page{padding:0 10px}#map{height:430px}}
 </style>
 </head>
 <body>
-<header><div class="logo">kcal.</div><div class="muted" id="today"></div></header>
+<header><div><div class="logo">kcal<span>.</span></div><div class="small">YOUR DAILY HEALTH HUB</div></div><div>💜</div></header>
 
-<section id="dashboard" class="page active">
-<h1>Today's progress</h1>
-<p class="muted">Build habits. Track progress. Keep going.</p>
-<div class="card">
-<div class="muted">Calories eaten today</div>
-<div class="big"><span id="total">0</span><span class="muted"> kcal</span></div>
-<div class="bar"><span id="calbar"></span></div>
-<div class="row"><span class="muted">Goal: <b id="goaltext">2000</b></span><span class="muted" id="remaining" style="text-align:right">2000 left</span></div>
-</div>
-<div class="grid">
-<div class="stat"><span class="muted">Protein</span><strong id="protein">0g</strong></div>
-<div class="stat"><span class="muted">Carbs</span><strong id="carbs">0g</strong></div>
-<div class="stat"><span class="muted">Fat</span><strong id="fat">0g</strong></div>
-<div class="stat"><span class="muted">Workouts today</span><strong id="workcount">0</strong></div>
-</div>
-<div class="card">
-<h2>Daily calorie goal</h2>
-<label for="goal">Goal in calories</label>
-<input id="goal" type="number" min="1" value="2000">
-<button onclick="saveGoal()">Save goal</button>
-</div>
-<div class="card">
-<h2>Quick actions</h2>
-<div class="grid">
-<button onclick="showPage('food')">＋ Log food</button>
-<button class="secondary" onclick="showPage('weight')">＋ Log weight</button>
-<button class="secondary" onclick="showPage('workout')">＋ Workout</button>
-<button class="secondary" onclick="goToScanner()">📷 Food Scanner</button>
-</div>
-</div>
+<section id="home" class="page active">
+ <div class="card">
+  <div class="small">TODAY'S OVERVIEW</div><h1>You're showing up. 💜</h1>
+  <div class="grid">
+   <div class="stat"><span class="small">Calories eaten</span><strong id="eaten">0</strong></div>
+   <div class="stat"><span class="small">Calories remaining</span><strong id="remaining">2000</strong></div>
+  </div>
+  <div class="bar"><i id="calBar"></i></div>
+  <div class="field"><label>Daily calorie goal</label><input id="goal" type="number" value="2000"></div>
+  <button class="btn full" onclick="saveGoal()">Save goal</button>
+ </div>
+ <div class="grid">
+  <div class="stat">🥩 Protein<strong id="proteinTotal">0 g</strong></div>
+  <div class="stat">🍞 Carbs<strong id="carbsTotal">0 g</strong></div>
+  <div class="stat">🥑 Fat<strong id="fatTotal">0 g</strong></div>
+  <div class="stat">⚖️ Weight<strong id="latestWeight">—</strong></div>
+ </div>
 </section>
 
 <section id="food" class="page">
-<h1>Food tracker</h1>
-<p class="muted">Take a food picture or choose one from your library.</p>
-<div class="card">
-<h2>📷 Food Scanner</h2>
-<button type="button" onclick="openScanner()">📷 Open Food Scanner</button>
-<input class="file-input" id="foodPhoto" type="file" accept="image/*" aria-label="Food Scanner: choose photo, take photo, or select a file">
-<img id="preview" class="preview" hidden alt="Selected food photo">
-<p class="hint">Choose Photo Library, Take Photo, or Choose File from the iPhone popup.</p>
-</div>
-
-<div class="card">
-<h2>Log a meal</h2>
-<label for="fname">Food name</label>
-<input id="fname" placeholder="e.g. Chicken and rice">
-<div class="row">
-<div><label for="fcal">Calories</label><input id="fcal" type="number" min="0" placeholder="450"></div>
-<div><label for="fpro">Protein (g)</label><input id="fpro" type="number" min="0" placeholder="30"></div>
-</div>
-<div class="row">
-<div><label for="fcarb">Carbs (g)</label><input id="fcarb" type="number" min="0" placeholder="45"></div>
-<div><label for="ffat">Fat (g)</label><input id="ffat" type="number" min="0" placeholder="12"></div>
-</div>
-<button onclick="addFood()">＋ Add food</button>
-<p class="hint">Photo selection works, but automatic calorie recognition is not connected yet.</p>
-</div>
-<div class="card"><h2>Today's meals</h2><div id="foodlist"></div></div>
+ <h1>Food tracker</h1>
+ <div class="card">
+  <h2>📸 Food Scanner</h2>
+  <button class="btn full" onclick="document.getElementById('photo').click()">Open Food Scanner</button>
+  <input id="photo" type="file" accept="image/*" hidden>
+  <img id="preview" style="display:none;width:100%;margin-top:12px;border-radius:14px" alt="Food preview">
+  <p class="hint">Choose a photo, then enter the nutrition details below. Photo scanning does not automatically calculate calories.</p>
+ </div>
+ <div class="card">
+  <h2>Add food</h2>
+  <form id="foodForm">
+   <div class="field"><label>Food name</label><input id="foodName" required placeholder="Chicken sandwich"></div>
+   <div class="grid">
+    <div class="field"><label>Calories</label><input id="foodCalories" type="number" min="0" required></div>
+    <div class="field"><label>Protein (g)</label><input id="foodProtein" type="number" min="0" value="0"></div>
+    <div class="field"><label>Carbs (g)</label><input id="foodCarbs" type="number" min="0" value="0"></div>
+    <div class="field"><label>Fat (g)</label><input id="foodFat" type="number" min="0" value="0"></div>
+   </div>
+   <button class="btn full">Add food</button>
+  </form>
+ </div>
+ <div class="card"><h2>Today's food</h2><div id="foodList" class="muted">Nothing logged yet.</div></div>
 </section>
 
 <section id="weight" class="page">
-<h1>Weight tracker</h1>
-<p class="muted">Record measurements and follow your history.</p>
-<div class="card">
-<h2>Log weight</h2>
-<label for="weightval">Your weight</label>
-<input id="weightval" type="number" min="0" step="0.1" placeholder="Enter weight">
-<label for="unit">Unit</label>
-<select id="unit"><option value="lb">Pounds (lb)</option><option value="kg">Kilograms (kg)</option></select>
-<button onclick="addWeight()">Save weight</button>
-</div>
-<div class="card">
-<h2>Your progress</h2>
-<div id="weightstats" class="muted">Log a weight to start your history.</div>
-<svg id="chart" viewBox="0 0 320 150" role="img" aria-label="Weight history chart"></svg>
-</div>
-<div class="card"><h2>Weight history</h2><div id="weightlist"></div></div>
+ <h1>Weight tracker</h1>
+ <div class="card"><h2>Add weigh-in</h2><form id="weightForm">
+  <div class="field"><label>Weight (lb)</label><input id="weightInput" type="number" min="1" step=".1" required></div>
+  <button class="btn full">Save weight</button>
+ </form></div>
+ <div class="card"><h2>Weight history</h2><div id="weightList" class="muted">No weigh-ins yet.</div></div>
 </section>
 
 <section id="workout" class="page">
-<h1>Workout tracker</h1>
-<p class="muted">Record exercises, sets, reps and weights.</p>
-<div class="card">
-<h2>Add an exercise</h2>
-<label for="category">Workout category</label>
-<select id="category">
-<option>Chest</option><option>Back</option><option>Legs</option><option>Shoulders</option><option>Arms</option><option>Abs</option><option>Cardio</option><option>Full body</option><option>Other</option>
-</select>
-<label for="exercise">Exercise name</label>
-<input id="exercise" placeholder="e.g. Bench press">
-<div class="row">
-<div><label for="sets">Sets</label><input id="sets" type="number" min="1" value="3"></div>
-<div><label for="reps">Reps</label><input id="reps" type="number" min="1" value="10"></div>
-</div>
-<div class="row">
-<div><label for="liftweight">Weight lifted</label><input id="liftweight" type="number" min="0" step="0.5" placeholder="Optional"></div>
-<div><label for="liftunit">Unit</label><select id="liftunit"><option>lb</option><option>kg</option></select></div>
-</div>
-<button onclick="addWorkout()">＋ Save exercise</button>
-</div>
-<div class="card"><h2>Workout history</h2><div id="worklist"></div></div>
+ <h1>Workout log</h1>
+ <div class="card"><h2>Log exercise</h2><form id="workoutForm">
+  <div class="field"><label>Category</label><select id="workoutType"><option>Strength</option><option>Cardio</option><option>Mobility</option><option>Sports</option></select></div>
+  <div class="field"><label>Exercise</label><input id="exerciseName" required placeholder="Squats"></div>
+  <div class="grid">
+   <div class="field"><label>Sets</label><input id="sets" type="number" min="1" value="3"></div>
+   <div class="field"><label>Reps</label><input id="reps" type="number" min="1" value="10"></div>
+   <div class="field"><label>Weight (lb)</label><input id="liftWeight" type="number" min="0" value="0"></div>
+  </div>
+  <button class="btn full">Save workout</button>
+ </form></div>
+ <div class="card"><h2>Workout history</h2><div id="workoutList" class="muted">No workouts yet.</div></div>
+</section>
+
+<section id="cardio" class="page">
+ <div class="small">GPS ACTIVITY</div><h1>Cardio</h1><p>Track your route in real time.</p>
+ <div class="card">
+  <div class="pills"><button id="walkBtn" class="active" onclick="chooseMode('walk')">🚶 Walk</button><button id="runBtn" onclick="chooseMode('run')">🏃 Run</button></div>
+  <div id="map"></div>
+  <button class="btn secondary full" style="margin-top:9px" onclick="recenter()">◎ Center on me</button>
+  <div class="metrics">
+   <div class="metric"><strong id="timer">00:00</strong><span>TIME</span></div>
+   <div class="metric"><strong id="pace">—:—</strong><span>AVG PACE /MI</span></div>
+   <div class="metric"><strong id="distance">0.00</strong><span>DISTANCE · MI</span></div>
+  </div>
+  <div class="grid" id="stepsCard">
+   <div class="stat"><span class="small">👣 Estimated steps</span><strong id="steps">0</strong></div>
+   <div class="stat"><span class="small">GPS accuracy</span><strong id="accuracy">—</strong></div>
+  </div>
+  <div class="grid" style="margin-top:12px">
+   <button id="startBtn" class="btn full" onclick="startWorkout()">Start Walk</button>
+   <button id="pauseBtn" class="btn secondary full" onclick="pauseWorkout()" disabled>Pause</button>
+  </div>
+  <button id="stopBtn" class="btn danger full" style="margin-top:9px" onclick="stopWorkout()" disabled>Stop & Save Workout</button>
+  <p id="cardioHint" class="hint">Allow location access when asked. Keep this page open during your workout. Your route is saved on this device.</p>
+ </div>
+ <div class="card"><h2>Completed sessions</h2><div id="sessionList" class="muted">Your saved workouts will appear here.</div></div>
 </section>
 
 <nav>
-<button class="active" data-page="dashboard" onclick="showPage('dashboard')">⌂<br>Home</button>
-<button data-page="food" onclick="showPage('food')">＋<br>Food</button>
-<button data-page="weight" onclick="showPage('weight')">↗<br>Weight</button>
-<button data-page="workout" onclick="showPage('workout')">▣<br>Workout</button>
+ <button class="active" data-tab="home"><b>⌂</b>Home</button>
+ <button data-tab="food"><b>◉</b>Food</button>
+ <button data-tab="weight"><b>⚖</b>Weight</button>
+ <button data-tab="workout"><b>✦</b>Workout</button>
+ <button data-tab="cardio"><b>⌁</b>Cardio</button>
 </nav>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-function read(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
-function store(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{alert('Browser storage is full. Try a smaller photo.')}}
-function todayKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-function safeText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-
-let foods=read('kcalFoods',[]).map(x=>({...x,date:x.date||todayKey()}));
-let weights=read('kcalWeights',[]);
-let workouts=read('kcalWorkouts',[]);
-let goal=Number(localStorage.getItem('kcalGoal'))||2000;
-let photoData='';
-
-function showPage(page){
-document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page));
-document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
-render();
-}
-function goToScanner(){showPage('food');openScanner()}
-function openScanner(){$('foodPhoto').click()}
-function saveGoal(){goal=Math.max(1,Number($('goal').value)||2000);localStorage.setItem('kcalGoal',String(goal));render()}
-
-function addFood(){
-const name=$('fname').value.trim(),raw=$('fcal').value,cal=Number(raw);
-if(!name||raw===''||!Number.isFinite(cal)||cal<0){alert('Enter a food name and valid calorie amount.');return}
-foods.unshift({id:Date.now(),name,cal,pro:Number($('fpro').value)||0,carb:Number($('fcarb').value)||0,fat:Number($('ffat').value)||0,date:todayKey(),photo:photoData});
-store('kcalFoods',foods);
-['fname','fcal','fpro','fcarb','ffat'].forEach(id=>$(id).value='');
-photoData='';$('foodPhoto').value='';$('preview').hidden=true;render();
-}
-function addWeight(){
-const val=Number($('weightval').value);
-if(!val||val<=0){alert('Enter a valid weight.');return}
-weights.push({id:Date.now(),val,unit:$('unit').value,date:todayKey()});
-store('kcalWeights',weights);$('weightval').value='';render();
-}
-function addWorkout(){
-const name=$('exercise').value.trim(),sets=Number($('sets').value),reps=Number($('reps').value);
-if(!name||sets<1||reps<1){alert('Enter an exercise, sets and reps.');return}
-workouts.unshift({id:Date.now(),name,category:$('category').value,sets,reps,weight:Number($('liftweight').value)||0,unit:$('liftunit').value,date:todayKey()});
-store('kcalWorkouts',workouts);$('exercise').value='';$('liftweight').value='';render();
-}
-function removeItem(type,id){
-if(!confirm('Delete this entry?'))return;
-if(type==='food')foods=foods.filter(x=>x.id!==id);
-if(type==='weight')weights=weights.filter(x=>x.id!==id);
-if(type==='workout')workouts=workouts.filter(x=>x.id!==id);
-const key={food:'kcalFoods',weight:'kcalWeights',workout:'kcalWorkouts'}[type];
-store(key,{food:foods,weight:weights,workout:workouts}[type]);render();
-}
-function entry(title,detail,type,id){
-return `<div class="entry"><div><b>${safeText(title)}</b><small>${safeText(detail)}</small></div><button class="danger" onclick="removeItem('${type}',${Number(id)})">Delete</button></div>`;
-}
+const day=()=>new Date().toLocaleDateString('en-CA');
+const load=()=>{try{return JSON.parse(localStorage.getItem('kcal-neon')||'{}')}catch{return {}}};
+let db=load();
+db.goal=db.goal||2000;db.foods=db.foods||[];db.weights=db.weights||[];db.workouts=db.workouts||[];db.sessions=db.sessions||[];
+const save=()=>localStorage.setItem('kcal-neon',JSON.stringify(db));
+const todayFoods=()=>db.foods.filter(x=>x.day===day());
+const sum=(arr,key)=>arr.reduce((s,x)=>s+(Number(x[key])||0),0);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function render(){
-const todays=foods.filter(x=>x.date===todayKey());
-const sum=k=>todays.reduce((n,x)=>n+(Number(x[k])||0),0),cal=sum('cal');
-$('total').textContent=Math.round(cal);$('goaltext').textContent=goal;$('goal').value=goal;
-$('remaining').textContent=cal<=goal?`${Math.round(goal-cal)} left`:`${Math.round(cal-goal)} over goal`;
-$('calbar').style.width=Math.min(100,cal/goal*100)+'%';
-$('protein').textContent=Math.round(sum('pro'))+'g';$('carbs').textContent=Math.round(sum('carb'))+'g';$('fat').textContent=Math.round(sum('fat'))+'g';
-$('workcount').textContent=workouts.filter(x=>x.date===todayKey()).length;
-$('foodlist').innerHTML=todays.length?todays.map(x=>entry(x.name+(x.photo?' 📷':''),`${x.cal} kcal · Protein ${x.pro||0}g · Carbs ${x.carb||0}g · Fat ${x.fat||0}g`,'food',x.id)).join(''):'<div class="empty">No food logged today yet.</div>';
-const sorted=[...weights].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-$('weightstats').textContent=sorted.length?`Latest entry: ${sorted[sorted.length-1].val} ${sorted[sorted.length-1].unit} · ${sorted.length} entries`:'Log a weight to start your history.';
-$('weightlist').innerHTML=weights.length?[...weights].reverse().map(x=>entry(`${x.val} ${x.unit}`,x.date,'weight',x.id)).join(''):'<div class="empty">Your weight entries will appear here.</div>';
-$('worklist').innerHTML=workouts.length?workouts.map(x=>entry(x.name,`${x.date} · ${x.category} · ${x.sets} sets × ${x.reps} reps · ${x.weight?x.weight+' '+x.unit:'No weight entered'}`,'workout',x.id)).join(''):'<div class="empty">No workouts logged yet.</div>';
-drawChart(sorted);
+ const f=todayFoods(),cal=sum(f,'cal');
+ $('eaten').textContent=Math.round(cal);$('remaining').textContent=Math.max(0,db.goal-cal).toLocaleString();
+ $('goal').value=db.goal;$('calBar').style.width=Math.min(100,cal/db.goal*100)+'%';
+ $('proteinTotal').textContent=sum(f,'protein')+' g';$('carbsTotal').textContent=sum(f,'carbs')+' g';$('fatTotal').textContent=sum(f,'fat')+' g';
+ $('latestWeight').textContent=db.weights.length?db.weights[db.weights.length-1].value+' lb':'—';
+ $('foodList').innerHTML=f.length?f.slice().reverse().map(x=>`<div class="item"><b>${esc(x.name)}</b><div class="small">${x.cal} kcal · P ${x.protein}g · C ${x.carbs}g · F ${x.fat}g</div></div>`).join(''):'Nothing logged yet.';
+ $('weightList').innerHTML=db.weights.length?db.weights.slice().reverse().map(x=>`<div class="item"><b>${x.value} lb</b><div class="small">${esc(x.day)}</div></div>`).join(''):'No weigh-ins yet.';
+ $('workoutList').innerHTML=db.workouts.length?db.workouts.slice().reverse().map(x=>`<div class="item"><b>${esc(x.name)}</b><div class="small">${esc(x.type)} · ${x.sets} sets · ${x.reps} reps · ${x.weight} lb · ${esc(x.day)}</div></div>`).join(''):'No workouts yet.';
+ $('sessionList').innerHTML=db.sessions.length?db.sessions.slice().reverse().map(x=>`<div class="item"><b>${x.type} · ${Number(x.miles).toFixed(2)} mi</b><div class="small">${esc(x.date)} · ${x.time} · ${x.pace} /mi · ${x.type==='Walk'?x.steps+' estimated steps':'Run'}</div><button class="btn secondary" onclick="showRoute('${x.id}')">View route</button></div>`).join(''):'Your saved workouts will appear here.';
 }
-function drawChart(data){
-const svg=$('chart');svg.innerHTML='';if(!data.length)return;
-const ns='http://www.w3.org/2000/svg',vals=data.map(x=>x.val),min=Math.min(...vals),max=Math.max(...vals),range=max-min||1;
-const points=data.map((x,i)=>`${15+i*290/Math.max(1,data.length-1)},${130-(x.val-min)/range*105}`).join(' ');
-const line=document.createElementNS(ns,'polyline');
-line.setAttribute('points',points);line.setAttribute('fill','none');line.setAttribute('stroke','#fff');line.setAttribute('stroke-width','3');line.setAttribute('stroke-linecap','round');line.setAttribute('stroke-linejoin','round');svg.appendChild(line);
-data.forEach((x,i)=>{const c=document.createElementNS(ns,'circle');c.setAttribute('cx',15+i*290/Math.max(1,data.length-1));c.setAttribute('cy',130-(x.val-min)/range*105);c.setAttribute('r','4');c.setAttribute('fill','#fff');svg.appendChild(c)});
+function saveGoal(){let n=Number($('goal').value);if(n<500||n>10000){alert('Enter a goal between 500 and 10000.');return}db.goal=n;save();render()}
+$('foodForm').onsubmit=e=>{e.preventDefault();db.foods.push({name:$('foodName').value,cal:+$('foodCalories').value,protein:+$('foodProtein').value||0,carbs:+$('foodCarbs').value||0,fat:+$('foodFat').value||0,day:day()});e.target.reset();$('foodProtein').value=$('foodCarbs').value=$('foodFat').value=0;save();render()};
+$('weightForm').onsubmit=e=>{e.preventDefault();db.weights.push({value:+$('weightInput').value,day:day()});e.target.reset();save();render()};
+$('workoutForm').onsubmit=e=>{e.preventDefault();db.workouts.push({type:$('workoutType').value,name:$('exerciseName').value,sets:+$('sets').value,reps:+$('reps').value,weight:+$('liftWeight').value||0,day:day()});e.target.reset();save();render()};
+$('photo').onchange=e=>{let f=e.target.files[0];if(f){$('preview').src=URL.createObjectURL(f);$('preview').style.display='block'}};
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));if(b.dataset.tab==='cardio'&&map)setTimeout(()=>map.invalidateSize(),150);window.scrollTo(0,0)});
+
+/* Cardio GPS tracker */
+let mode='walk',map=null,marker=null,accuracyCircle=null,liveLine=null,watch=null,tick=null,route=[],meters=0,steps=0,started=0,elapsed=0,active=false,paused=false,lastPoint=null,lastTime=0,lastPeak=0,lastMag=0,motionFn=null;
+const miles=()=>meters/1609.344;
+const elapsedNow=()=>elapsed+(active&&!paused?Date.now()-started:0);
+const clock=ms=>{let s=Math.floor(ms/1000),m=Math.floor(s/60),h=Math.floor(m/60);return h?`${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`};
+function pace(){let mi=miles();if(mi<.015)return '—:—';let n=Math.round(elapsedNow()/60000/mi);return `${Math.floor(n/60)}:${String(n%60).padStart(2,'0')}`}
+function stats(){$('timer').textContent=clock(elapsedNow());$('distance').textContent=miles().toFixed(2);$('pace').textContent=pace();$('steps').textContent=steps.toLocaleString()}
+function initMap(){
+ if(map||!window.L)return;
+ map=L.map('map',{zoomControl:false}).setView([27.95,-82.46],15);
+ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap © CARTO'}).addTo(map);
+ L.control.zoom({position:'bottomright'}).addTo(map);
+ liveLine=L.polyline([],{color:'#9b7bff',weight:6,opacity:.95}).addTo(map);
+ marker=L.circleMarker([27.95,-82.46],{radius:8,color:'#fff',weight:3,fillColor:'#9b7bff',fillOpacity:1}).addTo(map);
+ accuracyCircle=L.circle([27.95,-82.46],{radius:0,color:'#9b7bff',fillOpacity:.1}).addTo(map);
 }
-function previewFile(file){
-if(!file)return;
-if(!file.type.startsWith('image/')){alert('Please choose an image.');return}
-if(file.size>8*1024*1024){alert('Choose a photo smaller than 8 MB.');return}
-const reader=new FileReader();
-reader.onload=()=>{photoData=reader.result;$('preview').src=photoData;$('preview').hidden=false};
-reader.readAsDataURL(file);
+function recenter(){if(map&&lastPoint)map.setView(lastPoint,17)}
+function chooseMode(m){if(active){alert('Stop your current workout before switching.');return}mode=m;$('walkBtn').classList.toggle('active',m==='walk');$('runBtn').classList.toggle('active',m==='run');$('stepsCard').style.display=m==='walk'?'grid':'none';$('startBtn').textContent='Start '+(m==='walk'?'Walk':'Run')}
+function onFix(pos){
+ if(!active||paused)return;
+ const c=pos.coords,p=[c.latitude,c.longitude],t=pos.timestamp||Date.now();
+ $('accuracy').textContent=Math.round(c.accuracy)+' m';
+ if(lastPoint){let d=map.distance(lastPoint,p),dt=(t-lastTime)/1000;if(!(d>.8&&dt<1)&&c.accuracy<=60&&d<150&&dt>0)meters+=d}
+ lastPoint=p;lastTime=t;route.push(p);liveLine.setLatLngs(route);marker.setLatLng(p);accuracyCircle.setLatLng(p);accuracyCircle.setRadius(Math.min(c.accuracy||0,100));map.panTo(p,{animate:true,duration:.35});stats();
 }
-$('foodPhoto').addEventListener('change',e=>previewFile(e.target.files[0]));
-$('today').textContent=new Date().toLocaleDateString(undefined,{month:'short',day:'numeric'});
-render();
+function geoError(e){$('cardioHint').textContent=e.code===1?'Location permission denied. Allow location access for this website in your iPhone settings.':'GPS unavailable. Try outdoors with a clear view of the sky.';if(!route.length){active=false;cleanup();buttons()}}
+function motionStart(){
+ if(mode!=='walk')return;
+ const enable=()=>{motionFn=e=>{if(!active||paused)return;let a=e.accelerationIncludingGravity;if(!a)return;let m=Math.sqrt((a.x||0)**2+(a.y||0)**2+(a.z||0)**2),t=Date.now();if(lastMag<10.4&&m>=12.2&&t-lastPeak>280){steps++;lastPeak=t;stats()}lastMag=m};window.addEventListener('devicemotion',motionFn)};
+ try{if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function')DeviceMotionEvent.requestPermission().then(x=>{if(x==='granted')enable()}).catch(()=>{});else if('DeviceMotionEvent'in window)enable()}catch(e){}
+}
+function motionStop(){if(motionFn)window.removeEventListener('devicemotion',motionFn);motionFn=null}
+function buttons(){$('startBtn').disabled=active&&!paused;$('startBtn').textContent=active?(paused?'Resume '+(mode==='walk'?'Walk':'Run'):'Tracking…'):'Start '+(mode==='walk'?'Walk':'Run');$('pauseBtn').disabled=!active;$('pauseBtn').textContent=paused?'Resume':'Pause';$('stopBtn').disabled=!active}
+function startWorkout(){
+ if(active&&paused){pauseWorkout();return}
+ if(!navigator.geolocation){alert('GPS is not available in this browser.');return}
+ if(!window.isSecureContext){alert('GPS needs HTTPS. Open the published GitHub Pages website.');return}
+ initMap();if(!map){alert('The map did not load. Check your internet connection and reload.');return}
+ route=[];meters=0;steps=0;elapsed=0;lastPoint=null;lastTime=0;started=Date.now();active=true;paused=false;liveLine.setLatLngs([]);buttons();stats();motionStart();
+ watch=navigator.geolocation.watchPosition(onFix,geoError,{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
+ tick=setInterval(stats,500);$('cardioHint').textContent='Tracking live. Keep this page open while walking or running.';
+}
+function pauseWorkout(){
+ if(!active)return;
+ if(!paused){elapsed+=Date.now()-started;paused=true;if(watch!==null)navigator.geolocation.clearWatch(watch);watch=null;motionStop()}
+ else{paused=false;started=Date.now();watch=navigator.geolocation.watchPosition(onFix,geoError,{enableHighAccuracy:true,maximumAge:1000,timeout:20000});motionStart()}
+ buttons();stats();
+}
+function cleanup(){if(watch!==null)navigator.geolocation.clearWatch(watch);watch=null;if(tick)clearInterval(tick);tick=null;motionStop()}
+function stopWorkout(){
+ if(!active)return;if(!paused)elapsed+=Date.now()-started;active=false;paused=false;cleanup();
+ const id=String(Date.now()),mi=miles(),pt=pace(),tm=clock(elapsed);
+ if(route.length>1){let line=L.polyline(route,{color:'#9b7bff',weight:6,opacity:.95}).addTo(map);map.fitBounds(line.getBounds().pad(.15))}
+ db.sessions.push({id,type:mode==='walk'?'Walk':'Run',date:new Date().toLocaleString(),miles:mi,meters,steps:mode==='walk'?steps:0,time:tm,pace:pt,route:route.slice()});save();render();buttons();$('cardioHint').textContent='Workout saved on your device. Your route is highlighted in purple.';stats()
+}
+function showRoute(id){const s=db.sessions.find(x=>x.id===id);document.querySelector('[data-tab="cardio"]').click();setTimeout(()=>{initMap();if(s&&s.route&&s.route.length){let l=L.polyline(s.route,{color:'#9b7bff',weight:6}).addTo(map);map.fitBounds(l.getBounds().pad(.15))}},200)}
+render();chooseMode('walk');buttons();
 </script>
 </body>
 </html>
