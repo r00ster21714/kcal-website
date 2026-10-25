@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080808">
+<title>kcal.</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080808;color:white;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+main{max-width:460px;margin:auto;padding:24px 20px 50px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:35px}
+h1{font-size:30px;margin:0;letter-spacing:-1px}
+button{border:0;border-radius:12px;padding:14px 17px;font-size:15px;font-weight:650;cursor:pointer}
+.primary{background:white;color:#080808;width:100%}
+.secondary{background:#202020;color:white}
+input{width:100%;padding:15px;background:#161616;border:1px solid #333;border-radius:12px;color:white;font-size:16px;margin:7px 0 15px}
+label{font-size:13px;color:#bbb}
+.card{background:#151515;border:1px solid #292929;border-radius:20px;padding:20px;margin:15px 0}
+.muted{color:#999;font-size:13px}
+.big{font-size:43px;font-weight:750;letter-spacing:-2px}
+.track{height:7px;background:#333;border-radius:10px;overflow:hidden;margin:13px 0}
+.fill{height:100%;background:white;width:0%;transition:width .2s}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.macro{background:#202020;padding:13px 8px;border-radius:13px;text-align:center}
+.macro strong{display:block;margin-top:8px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+a{color:white}
+.hidden{display:none!important}
+.food{padding:13px 0;border-bottom:1px solid #333}
+h2{font-size:19px;margin:0 0 16px}
+</style>
+</head>
+<body>
+<main>
+<section id="auth">
+<header><h1>kcal.</h1><span class="muted">YOUR DAILY HEALTH</span></header>
+<h2 style="font-size:29px">Welcome to kcal.</h2>
+<p class="muted">Your goals. Your progress. All in one place.</p>
+<div class="card">
+<label>Email address</label>
+<input id="email" type="email" placeholder="you@example.com" autocomplete="email">
+<label>Password</label>
+<input id="password" type="password" placeholder="At least 6 characters" autocomplete="current-password">
+<button class="primary" onclick="enter()">Continue</button>
+<p class="muted" style="text-align:center">Demo mode: sign-in is not connected to real accounts.</p>
+<button class="secondary" style="width:100%" onclick="alert('Google sign-in needs a configured authentication service before it can work.')">Continue with Google</button>
+</div>
+</section>
+<section id="app" class="hidden">
+<header><h1>kcal.</h1><button class="secondary" onclick="logout()">Sign out</button></header>
+<p class="muted">YOUR DAILY PROGRESS</p>
+<div class="card">
+<div class="row"><span class="muted">Calories eaten</span><span class="muted">Goal: 2,000</span></div>
+<div class="big" id="total">0 <span style="font-size:16px;letter-spacing:0">kcal</span></div>
+<div class="track"><div class="fill" id="bar"></div></div>
+<div class="muted" id="remaining">2,000 calories remaining</div>
+</div>
+<div class="grid">
+<div class="macro"><span class="muted">Protein</span><strong id="protein">0 g</strong></div>
+<div class="macro"><span class="muted">Carbs</span><strong id="carbs">0 g</strong></div>
+<div class="macro"><span class="muted">Fat</span><strong id="fat">0 g</strong></div>
+</div>
+<div class="card">
+<h2>Add food</h2>
+<label>Food name</label><input id="food" placeholder="e.g. Chicken and rice">
+<div class="row">
+<div style="width:100%"><label>Calories</label><input id="cal" type="number" min="0" placeholder="350"></div>
+<div style="width:100%"><label>Protein (g)</label><input id="pro" type="number" min="0" placeholder="25"></div>
+</div>
+<div class="row">
+<div style="width:100%"><label>Carbs (g)</label><input id="carb" type="number" min="0" placeholder="40"></div>
+<div style="width:100%"><label>Fat (g)</label><input id="fatInput" type="number" min="0" placeholder="10"></div>
+</div>
+<button class="primary" onclick="addFood()">+ Add to today's log</button>
+</div>
+<div class="card">
+<div class="row"><h2>Today's food</h2><button class="secondary" onclick="clearFoods()">Clear</button></div>
+<div id="foods" class="muted">No food logged yet.</div>
+</div>
+<p class="muted" style="text-align:center">kcal. · Small steps, consistent progress.</p>
+</section>
+</main>
+<script>
+let items=[];
+try{items=JSON.parse(localStorage.getItem('kcalFoods')||'[]')}catch(e){}
+function enter(){
+let e=document.getElementById('email').value.trim();
+let p=document.getElementById('password').value;
+if(!e||!e.includes('@')||p.length<6){alert('Enter a valid email and a password of at least 6 characters. This is demo mode only; no account will be created.');return}
+document.getElementById('auth').classList.add('hidden');
+document.getElementById('app').classList.remove('hidden');
+render();
+}
+function logout(){document.getElementById('app').classList.add('hidden');document.getElementById('auth').classList.remove('hidden')}
+function addFood(){
+let name=document.getElementById('food').value.trim();
+let cal=Number(document.getElementById('cal').value);
+if(!name||!Number.isFinite(cal)||cal<0){alert('Enter a food name and valid calories.');return}
+items.push({name,cal,pro:Number(document.getElementById('pro').value)||0,carb:Number(document.getElementById('carb').value)||0,fat:Number(document.getElementById('fatInput').value)||0});
+try{localStorage.setItem('kcalFoods',JSON.stringify(items))}catch(e){}
+['food','cal','pro','carb','fatInput'].forEach(id=>document.getElementById(id).value='');
+render();
+}
+function clearFoods(){if(confirm('Clear today’s food log?')){items=[];try{localStorage.removeItem('kcalFoods')}catch(e){}render()}}
+function render(){
+let sum=k=>items.reduce((a,x)=>a+(Number(x[k])||0),0);
+let c=sum('cal');
+document.getElementById('total').innerHTML=c+' <span style="font-size:16px;letter-spacing:0">kcal</span>';
+document.getElementById('remaining').textContent=Math.max(0,2000-c).toLocaleString()+' calories remaining';
+document.getElementById('bar').style.width=Math.min(100,c/2000*100)+'%';
+['protein','carbs','fat'].forEach((id,i)=>document.getElementById(id).textContent=sum(['pro','carb','fat'][i])+' g');
+document.getElementById('foods').innerHTML=items.length?items.map(x=>'<div class="food"><div class="row"><strong>'+escapeText(x.name)+'</strong><span>'+x.cal+' kcal</span></div><div class="muted">P '+x.pro+'g · C '+x.carb+'g · F '+x.fat+'g</div></div>').join(''):'No food logged yet.';
+}
+function escapeText(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+render();
+</script>
+</body>
+</html>
